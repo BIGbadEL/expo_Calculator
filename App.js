@@ -21,10 +21,8 @@ export default class App extends React.Component {
         newNumber: false,
         cleared: false,
         loading: true,
-        index: 0,
-        memory_1: 0,
-        memory_2: 0,
-        memory_3: 0,
+        memory_index: 0,
+        memory: [],
 
     }
   }
@@ -37,81 +35,50 @@ export default class App extends React.Component {
   }
 
   memory_empty(){
-      if(this.state.index === 0){
-          return true;
-      }else{
-          return false;
-      }
+      if(this.state.memory_index === 0) return false;
+      else return true;
   }
 
   memory_full(){
-      if(this.state.index >= 3){
-          return true;
-      }else{
-          return false;
-      }
+      if(this.state.memory_index >= 3) return false;
+      else return true;
   }
 
-  memory_add (){
-      var i = this.state.index + 1;
-      if(i == 1)
-          this.setState({
-              index: i,
-              memory_1: this.state.count,
-              count: 0,
-          })
-      if(i == 2)
-          this.setState({
-              index: i,
-              memory_2: this.state.count,
-              count: 0,
-          })
-      if(i == 3)
-          this.setState({
-              index: i,
-              memory_3: this.state.count,
-              count: 0,
-          })
-      return true;
+  memory_add(){
+      this.state.memory.push(this.state.count);
+      this.setState({
+          memory_index: this.state.memory_index + 1,
+          count: 0,
+      })
   }
 
   memory_return(){
-      var i = this.state.index;
-      if(i == 1)
-          this.setState({
-              index: i-1,
-              count: this.state.memory_1,
-          })
-      if(i == 2)
-          this.setState({
-              index: i-1,
-              count: this.state.memory_2,
-          })
-      if(i == 3)
-          this.setState({
-              index: i-1,
-              count: this.state.memory_3,
-          })
+      this.setState({
+          count: this.state.memory.pop(),
+          memory_index: this.state.memory_index - 1,
+      })
   }
 
+
   onPress_MPlus = () => {
-      if(this.memory_full())
+      if(this.memory_full()){
+          this.memory_add();
+      }else{
           this.setState({
               count: 'Pamięć pełna',
           })
-      else{
-          this.memory_add();
       }
   }
   onPress_MR = () => {
       if(this.memory_empty()){
-          this.setState({
-              count: 'Pamięć pusta',
-          })
-      }else{
-          this.memory_return();
-      }
+         this.memory_return();
+     }else{
+         this.setState({
+             count: 'Pamięć pusta',
+         })
+     }
   }
+
 
 
   onPress_number(number){
@@ -171,128 +138,73 @@ export default class App extends React.Component {
         switch (this.state.Char) {
             case '*':
             this.setState({
-                count: (this.state.count * this.state.Left).toFixed(4),
-                Left: this.state.count * this.state.Left,
-                isChar: true,
-                newNumber: true,
-                Char: znak,
-                isComma: false
+                count: (this.state.count * this.state.Left),
             })
                 break;
             case '÷':
                 this.setState({
-                    count: (this.state.Left / this.state.count).toFixed(4),
-                    Left: (this.state.Left / this.state.count).toFixed(4),
-                    isChar: true,
-                    newNumber: true,
-                    Char: znak,
-                    isComma: false
+                    count: (this.state.Left / this.state.count),
                 })
                 break;
             case '+':
                 this.setState({
                     count: parseFloat(this.state.Left) + parseFloat(this.state.count),
-                    Left: parseFloat(this.state.Left) + parseFloat(this.state.count),
-                    isChar: true,
-                    newNumber: true,
-                    Char: znak,
-                    isComma: false
                 })
                 break;
             case '-':
                 this.setState({
                     count: this.state.Left - this.state.count,
-                    Left: this.state.Left - this.state.count,
-                    isChar: true,
-                    newNumber: true,
-                    Char: znak,
-                    isComma: false
                 })
                 break;
-
-
         }
+        this.setState({
+            Left: this.state.count,
+            isChar: true,
+            newNumber: true,
+            Char: znak,
+            isComma: false
+        })
     }else{
-        switch (znak) {
-            case '*':
-                this.setState({
-                    Left: this.state.count,
-                    isChar: true,
-                    newNumber: true,
-                    Char: '*',
-                    isComma: false
-                })
-                break;
-            case '÷':
-                this.setState({
-                    Left: this.state.count,
-                    isChar: true,
-                    newNumber: true,
-                    Char: '÷',
-                    isComma: false
-                })
-                    break;
-            case '+':
-                this.setState({
-                    Left: this.state.count,
-                    isChar: true,
-                    newNumber: true,
-                    Char: '+',
-                    isComma: false
-                })
-                break;
-            case '-':
-                this.setState({
-                    Left: this.state.count,
-                    isChar: true,
-                    newNumber: true,
-                    Char: '-',
-                    isComma: false
-                })
-                break;
-        }
+        this.setState({
+            Left: this.state.count,
+            isChar: true,
+            newNumber: true,
+            Char: znak,
+            isComma: false
+        })
     }
   }
   onPress_equal = () => {
     switch (this.state.Char) {
         case '*':
             this.setState({
-                count: (this.state.count * this.state.Left).toFixed(4),
-                Left: this.state.count,
-                isChar: false,
-                isComma: false,
-                newNumber: true,
+                count: (this.state.count * this.state.Left),
             })
             break;
         case '÷':
             this.setState({
-                count: (this.state.Left / this.state.count).toFixed(4),
-                Left: this.state.count,
-                isChar: false,
-                isComma: false,
-                newNumber: true,
+                count: (this.state.Left / this.state.count),
+
             })
             break;
         case '+':
             this.setState({
                 count: parseFloat(this.state.Left) + parseFloat(this.state.count),
-                Left: this.state.count,
-                isChar: false,
-                isComma: false,
-                newNumber: true,
             })
             break;
         case '-':
             this.setState({
                 count: this.state.Left - this.state.count,
-                Left: this.state.count,
-                isChar: false,
-                isComma: false,
-                newNumber: true,
             })
             break;
 
     }
+    this.setState({
+        Left: this.state.count,
+        isChar: false,
+        isComma: false,
+        newNumber: true,
+    })
   }
 
  render() {
