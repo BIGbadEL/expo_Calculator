@@ -23,7 +23,9 @@ export default class App extends React.Component {
         loading: true,
         memory_index: 0,
         memory: [],
-
+        step: 0,
+        new_step: false,
+        is_euqal: false,
     }
   }
 
@@ -59,7 +61,6 @@ export default class App extends React.Component {
       })
   }
 
-
   onPress_MPlus = () => {
       if(this.memory_full()){
           this.memory_add();
@@ -69,6 +70,7 @@ export default class App extends React.Component {
           })
       }
   }
+
   onPress_MR = () => {
       if(this.memory_empty()){
          this.memory_return();
@@ -78,8 +80,6 @@ export default class App extends React.Component {
          })
      }
   }
-
-
 
   onPress_number(number){
       if(this.state.count != '0' && !this.state.newNumber){
@@ -124,11 +124,14 @@ export default class App extends React.Component {
               count: 0,
               Right: 0,
               Left: 0,
+              step: 0,
               isChar: false,
               Char: 0,
               isComma: false,
               newNumber: false,
-              cleared: false
+              cleared: false,
+              new_step: false,
+              is_euqal: false
           })
       }
   }
@@ -139,42 +142,62 @@ export default class App extends React.Component {
             case '*':
             this.setState({
                 count: (this.state.count * this.state.Left),
+                Left: (this.state.count * this.state.Left),
             })
                 break;
             case '÷':
                 this.setState({
                     count: (this.state.Left / this.state.count),
+                    Left: (this.state.Left / this.state.count),
                 })
                 break;
             case '+':
                 this.setState({
                     count: parseFloat(this.state.Left) + parseFloat(this.state.count),
+                    Left: parseFloat(this.state.Left) + parseFloat(this.state.count),
                 })
                 break;
             case '-':
                 this.setState({
                     count: this.state.Left - this.state.count,
+                    Left: this.state.Left - this.state.count,
                 })
                 break;
         }
         this.setState({
-            Left: this.state.count,
             isChar: true,
             newNumber: true,
             Char: znak,
-            isComma: false
+            isComma: false,
+            is_euqal: false
         })
+
+        if(this.state.new_step){
+            this.setState({
+                step: this.state.step + ' ' + znak + ' ' + this.state.count,
+            })
+        }else{
+            this.setState({
+                step: this.state.step + ' ' + this.state.count,
+                new_step: true,
+            })
+        }
+
     }else{
         this.setState({
             Left: this.state.count,
+            step: this.state.count + ' ' + znak,
             isChar: true,
             newNumber: true,
             Char: znak,
-            isComma: false
+            isComma: false,
+            is_euqal: false
         })
     }
   }
+
   onPress_equal = () => {
+      if(!this.state.is_euqal){
     switch (this.state.Char) {
         case '*':
             this.setState({
@@ -204,7 +227,19 @@ export default class App extends React.Component {
         isChar: false,
         isComma: false,
         newNumber: true,
+        is_euqal: true,
     })
+    if(this.state.new_step){
+        this.setState({
+            step: this.state.step + ' ' + this.state.Char + ' ' + this.state.count + ' = ',
+            new_step: false,
+        })
+    }else{
+        this.setState({
+            step: this.state.step + ' ' + this.state.count + ' = ',
+        })
+    }
+}
   }
 
  render() {
@@ -216,6 +251,11 @@ export default class App extends React.Component {
    return (
      <View style={styles.container}>
      <View style={styles.wejscie}>
+         <View style={styles.countContainer}>
+             <Text style={styles.historyText }>
+                { this.state.step !== 0 ? this.state.step: null}
+              </Text>
+        </View>
          <View style={styles.countContainer}>
              <Text style={styles.countText}>
                 {this.state.count}
@@ -407,12 +447,12 @@ const styles = StyleSheet.create({
   },
   row: {
       flexDirection: 'row',
-      height
-      : '12.5%',
+      height: '12.5%',
   },
   countContainer: {
     alignItems: 'flex-end',
     padding: 10,
+    maxHeight: '25%',
   },
   countText: {
     color: '#FF00FF',
@@ -422,7 +462,12 @@ const styles = StyleSheet.create({
  Tekst: {
     fontFamily: 'Raleway',
     fontSize: 30,
-  }
+},
+  historyText: {
+      color: '#BBBBBB',
+      fontSize: 45,
+      fontFamily: 'Raleway',
+  },
 })
 
 // AppRegistry.registerComponent('App', () => App)
